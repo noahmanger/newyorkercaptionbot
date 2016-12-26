@@ -90,11 +90,13 @@ CaptionBot.prototype.splitText = function(text) {
 };
 
 CaptionBot.prototype.makeImage = function(text) {
+  console.log('Making image');
   this.fetchImage();
   var y; // Y-coordinates, will be derived from the height
   var text = this.splitText(text);
   var self = this;
   this.emitter.on('fetchedCartoon', function(result) {
+    console.log('received cartoon')
     gm(request(result))
       .resize(600)
       .size(function(err, size) {
