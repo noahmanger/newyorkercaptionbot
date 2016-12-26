@@ -102,6 +102,7 @@ CaptionBot.prototype.makeImage = function(text) {
       })
       .append('public/img/caption-bg.jpg')
       .toBuffer('JPG', function(err, buffer) {
+        if (err) { console.log(err); }
         gm(buffer, 'img.jpg')
         .font('public/caslon.ttf', 16)
         .drawText(20, 50, text[0], 'south')
@@ -112,10 +113,12 @@ CaptionBot.prototype.makeImage = function(text) {
 };
 
 CaptionBot.prototype.postImage = function(err, buffer) {
-  if (err) { return false; }
+  if (err) { console.log(err); }
   var T = this.T;
   // Encode to base64
   var newImage = buffer.toString('base64');
+  console.log(message);
+  console.log(newImage);
   T.post('media/upload', {media_data: newImage}, function(err, data, response) {
     if (err) { console.log(err); }
     // Add meta data
@@ -124,6 +127,7 @@ CaptionBot.prototype.postImage = function(err, buffer) {
     var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
     // Post the tweet
     T.post('media/metadata/create', meta_params, function (err, data, response) {
+      if (err) { console.log(err); }
       if (!err) {
         // now we can reference the media and post a tweet (media will attach to the tweet)
         var params = { status: message, media_ids: [mediaIdStr] }
