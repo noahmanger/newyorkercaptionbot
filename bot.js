@@ -53,6 +53,7 @@ CaptionBot.prototype.handleTweet = function(tweet) {
 };
 
 CaptionBot.prototype.fetchImage = function() {
+  console.log('Fetching image');
   var self = this;
   nightmare
     .goto(URL)
@@ -71,6 +72,7 @@ CaptionBot.prototype.fetchImage = function() {
 };
 
 CaptionBot.prototype.splitText = function(text) {
+  console.log('Splitting text');
   if (text.length <= 70) {
     return [text, ''];
   } else {
@@ -119,8 +121,6 @@ CaptionBot.prototype.postImage = function(err, buffer) {
   var T = this.T;
   // Encode to base64
   var newImage = buffer.toString('base64');
-  console.log(message);
-  console.log(newImage);
   T.post('media/upload', {media_data: newImage}, function(err, data, response) {
     if (err) { console.log(err); }
     // Add meta data
