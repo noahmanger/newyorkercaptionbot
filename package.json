@@ -1,5 +1,5 @@
 {
-  "name": "New Yorker Caption Bot",
+  "name": "NewYorkerCaptionBot",
   "version": "1.0.0",
   "description": "A simple bot for adding captions to random New Yorker Cartoons",
   "main": "server.js",
