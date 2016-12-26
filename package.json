@@ -1,0 +1,30 @@
+{
+  "name": "New Yorker Caption Bot",
+  "version": "1.0.0",
+  "description": "A simple bot for adding captions to random New Yorker Cartoons",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "gm": "^1.23.0",
+    "nightmare": "^2.9.0",
+    "node-imagemagick": "^0.1.8",
+    "request": "^2.79.0",
+    "twit": "^2.1.0",
+  },
+  "engines": {
+    "node": "6.9.1"
+  },
+  "repository": {
+    "url": ""
+  },
+  "keywords": [
+    "node",
+    "gomix",
+    "twitter",
+    "twitterbot",
+    "bot"
+  ]
+}
