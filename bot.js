@@ -35,12 +35,13 @@ function CaptionBot(T) {
   });
 
   this.stream.on('connect', function (request) {
-    console.log('Connect');
+    console.log('Connecting...');
   })
 
 }
 
 CaptionBot.prototype.handleTweet = function(tweet) {
+  console.log('Tweet received');
   var handle = tweet.user.screen_name;
   // Filter out tweets from this account
   if (handle === this.name) { return false; };
