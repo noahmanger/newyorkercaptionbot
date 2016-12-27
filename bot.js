@@ -3,8 +3,7 @@ var Twit = require('twit'),
     request = require('request'),
     EventEmitter = require('events');
 
-var URL = 'http://www.newyorker.com/cartoons/random/randomAPI',
-    message;
+var URL = 'http://www.newyorker.com/cartoons/random/randomAPI';
 
 // T: An instance of Twit
 
@@ -15,6 +14,9 @@ function CaptionBot(T) {
   this.stream = T.stream('user', {replies: 'all', track: [this.name]});
 
   this.stream.on('tweet', this.handleTweet.bind(this));
+
+  this.emitter.on('madeImage', this.postImage.bind(this));
+  this.emitter.on('fetchedCartoon', this.compositeImages.bind(this));
 
   this.stream.on('limit', function (limitMessage) {
     console.log('Limited');
@@ -39,32 +41,22 @@ function CaptionBot(T) {
 }
 
 CaptionBot.prototype.handleTweet = function(tweet) {
-  console.log('Tweet received');
   var handle = tweet.user.screen_name;
   // Filter out tweets from this account
   if (handle === this.name) { return false; };
+  console.log(tweet);
 
   // Find the instance of bot handle
   var botHandle = tweet.text.match(/@nycaptionbot/i);
   // Filter out tweets that don't start with @ing me
   if (tweet.text.split(' ')[0] === botHandle[0]) {
     // Get the content and combine it into a message
-    var text = tweet.text.split(botHandle[0])[1];
-    message = 'Caption by @' + handle + '.';
-    this.makeImage(text);
+    var caption = tweet.text.split(botHandle[0])[1];
+    var message = 'Caption by @' + handle + '.';
+    this.fetchImage(caption, message);
   } else {
     console.log('That tweet was not formatted correctly');
   }
-};
-
-CaptionBot.prototype.fetchImage = function() {
-  console.log('Fetching image');
-  var self = this;
-  request(URL, function(err, response, body) {
-    var body = JSON.parse(body);
-    var img = body[0].src;
-    self.emitter.emit('fetchedCartoon', img);
-  });
 };
 
 CaptionBot.prototype.splitText = function(text) {
@@ -87,33 +79,45 @@ CaptionBot.prototype.splitText = function(text) {
   }
 };
 
-CaptionBot.prototype.makeImage = function(text) {
-  console.log('Making image');
-  this.fetchImage();
-  var y; // Y-coordinates, will be derived from the height
-  var text = this.splitText(text);
+CaptionBot.prototype.fetchImage = function(caption, message) {
+  console.log('Fetching image');
   var self = this;
-  this.emitter.on('fetchedCartoon', function(result) {
-    console.log('received cartoon')
-    gm(request(result))
-      .resize(600)
-      .size(function(err, size) {
-        y = size.height - 40;
-      })
-      .append('public/img/caption-bg.jpg')
-      .toBuffer('JPG', function(err, buffer) {
-        if (err) { console.log(err); }
-        gm(buffer, 'img.jpg')
-        .font('public/caslon.ttf', 18)
-        .drawText(20, 50, text[0], 'south')
-        .drawText(20, 30, text[1], 'south')
-        .toBuffer('JPG', self.postImage.bind(self));
-      })
-  })
+  request(URL, function(err, response, body) {
+    console.log('Image fetch complete');
+    var body = JSON.parse(body);
+    var src = body[0].src;
+    self.emitter.emit('fetchedCartoon', src, caption, message);
+  });
 };
 
-CaptionBot.prototype.postImage = function(err, buffer) {
-  if (err) { console.log(err); }
+CaptionBot.prototype.compositeImages = function(src, caption, message) {
+  console.log('Compositing images')
+  var y; // Y-coordinates, will be derived from the height
+  var text = this.splitText(caption);
+  var self = this;
+  gm(request(src))
+    .resize(600)
+    .size(function(err, size) {
+      y = size.height - 40;
+    })
+    .append('public/img/caption-bg.jpg')
+    .toBuffer('JPG', function(err, buffer) {
+      if (err) { console.log(err); }
+      gm(buffer, 'img.jpg')
+      .font('public/caslon.ttf', 18)
+      .drawText(20, 50, text[0], 'south')
+      .drawText(20, 30, text[1], 'south')
+      .toBuffer('JPG', function(err, buffer) {
+        if (!err) {
+          self.emitter.emit('madeImage', buffer, message);
+        }
+      });
+    })
+};
+
+CaptionBot.prototype.postImage = function(buffer, message) {
+  console.log('=====POSTING TWEET======');
+  console.log(message);
   var T = this.T;
   // Encode to base64
   var newImage = buffer.toString('base64');
