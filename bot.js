@@ -46,7 +46,7 @@ CaptionBot.prototype.handleTweet = function(tweet) {
 
   // Get the content and combine it into a message
   var text = tweet.text.split(this.name)[1];
-  message = '@' + handle + ': here ya go';
+  message = 'Caption by @' + handle + '.';
   this.makeImage(text);
 };
 
