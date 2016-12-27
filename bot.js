@@ -44,10 +44,17 @@ CaptionBot.prototype.handleTweet = function(tweet) {
   // Filter out tweets from this account
   if (handle === this.name) { return false; };
 
-  // Get the content and combine it into a message
-  var text = tweet.text.split(this.name)[1];
-  message = 'Caption by @' + handle + '.';
-  this.makeImage(text);
+  // Find the instance of bot handle
+  var botHandle = tweet.text.match(/@nycaptionbot/i);
+  // Filter out tweets that don't start with @ing me
+  if (tweet.text.split(' ')[0] === botHandle[0]) {
+    // Get the content and combine it into a message
+    var text = tweet.text.split(botHandle[0])[1];
+    message = 'Caption by @' + handle + '.';
+    this.makeImage(text);
+  } else {
+    console.log('That tweet was not formatted correctly');
+  }
 };
 
 CaptionBot.prototype.fetchImage = function() {
