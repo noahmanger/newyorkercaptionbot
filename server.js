@@ -12,8 +12,6 @@ var Twit = require('twit'),
     },
     T = new Twit(config.twitter);
 
-console.log(config.twitter);
-
 // Initialize bot
 var bot = new bot.CaptionBot(T);
 

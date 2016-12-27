@@ -1,11 +1,9 @@
 var Twit = require('twit'),
     gm = require('gm'),
     request = require('request'),
-    Nightmare = require('nightmare'),
     EventEmitter = require('events');
 
-var URL = 'http://www.newyorker.com/cartoons/random/',
-    nightmare = Nightmare({ show: false }),
+var URL = 'http://www.newyorker.com/cartoons/random/randomAPI',
     message;
 
 // T: An instance of Twit
@@ -55,20 +53,11 @@ CaptionBot.prototype.handleTweet = function(tweet) {
 CaptionBot.prototype.fetchImage = function() {
   console.log('Fetching image');
   var self = this;
-  nightmare
-    .goto(URL)
-    .wait('#cartoon img')
-    .evaluate(function() {
-      var src = document.querySelector('#cartoon img').src;
-      return src;
-    })
-    .end()
-    .then(function(result) {
-      self.emitter.emit('fetchedCartoon', result);
-    })
-    .catch(function (error) {
-      console.error('Search failed:', error);
-    });
+  request(URL, function(err, response, body) {
+    var body = JSON.parse(body);
+    var img = body[0].src;
+    self.emitter.emit('fetchedCartoon', img);
+  });
 };
 
 CaptionBot.prototype.splitText = function(text) {
