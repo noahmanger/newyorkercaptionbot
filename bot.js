@@ -104,9 +104,9 @@ CaptionBot.prototype.makeImage = function(text) {
       .toBuffer('JPG', function(err, buffer) {
         if (err) { console.log(err); }
         gm(buffer, 'img.jpg')
-        .font('public/caslon.ttf', 16)
+        .font('public/caslon.ttf', 18)
         .drawText(20, 50, text[0], 'south')
-        .drawText(20, 28, text[1], 'south')
+        .drawText(20, 30, text[1], 'south')
         .toBuffer('JPG', self.postImage.bind(self));
       })
   })
