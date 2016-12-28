@@ -105,8 +105,8 @@ CaptionBot.prototype.compositeImages = function(src, caption, message) {
       if (err) { console.log(err); }
       gm(buffer, 'img.jpg')
       .font('public/caslon.ttf', 18)
-      .drawText(20, 50, text[0], 'south')
-      .drawText(20, 30, text[1], 'south')
+      .drawText(0, 50, text[0], 'south')
+      .drawText(0, 30, text[1], 'south')
       .toBuffer('JPG', function(err, buffer) {
         if (!err) {
           self.emitter.emit('madeImage', buffer, message);
@@ -124,8 +124,8 @@ CaptionBot.prototype.postImage = function(buffer, message) {
   T.post('media/upload', {media_data: newImage}, function(err, data, response) {
     if (err) { console.log(err); }
     // Add meta data
-    var mediaIdStr = data.media_id_string
-    var altText = "New Yorker Cartoon"
+    var mediaIdStr = data.media_id_string;
+    var altText = "New Yorker Cartoon captioned by a random Twitter user";
     var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
     // Post the tweet
     T.post('media/metadata/create', meta_params, function (err, data, response) {
